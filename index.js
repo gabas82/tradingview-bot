@@ -1,13 +1,20 @@
-const express = require("express");
+import express from "express";
+
 const app = express();
 app.use(express.json());
 
+// Webhook endpoint
 app.post("/webhook", (req, res) => {
-    console.log("Received:", req.body);
-    res.send("OK");
+  console.log("Received webhook:", req.body);
 
-    // тук ще пращаме към Телеграм по-късно
+  res.status(200).json({
+    success: true,
+    received: req.body
+  });
 });
 
+// Start server – Railway provides PORT env
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running on port", PORT)); 
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+}); 
