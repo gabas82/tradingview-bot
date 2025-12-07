@@ -13,8 +13,8 @@ app.post("/webhook", async (req, res) => {
 
   const MESSAGE = `Signal: ${signal}\nPrice: ${price}\nPair: ${pair}`;
 
-  const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-  const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+  const TELEGRAM_TOKEN = 8420150299:AAHuxTuso-xmpca8LX7B6neyWW6FcPX0scw;
+  const TELEGRAM_CHAT_ID = 1379138847;
 
   const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
 
