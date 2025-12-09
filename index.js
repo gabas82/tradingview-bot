@@ -4,17 +4,18 @@ import fetch from "node-fetch";
 const app = express();
 app.use(express.json());
 
+// Test endpoint
 app.get("/", (req, res) => {
   res.send("Bot is running!");
 });
 
+// TradingView webhook
 app.post("/webhook", async (req, res) => {
   const { signal, price, pair } = req.body;
 
   const MESSAGE = `Signal: ${signal}\nPrice: ${price}\nPair: ${pair}`;
-
-  const TELEGRAM_TOKEN = 8420150299:AAHuxTuso-xmpca8LX7B6neyWW6FcPX0scw;
-  const TELEGRAM_CHAT_ID = 1379138847;
+  const TELEGRAM_TOKEN = "8420150299:AAF3clV0XvDiBdmz31glpkj4Z5z-3EPvQc8";
+  const TELEGRAM_CHAT_ID = "1379138847";
 
   const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
 
@@ -27,8 +28,10 @@ app.post("/webhook", async (req, res) => {
     }),
   });
 
-  res.json({ status: "ok" });
+  res.send("OK");
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log("Running on port " + PORT)); 
+// Start server
+app.listen(3000, () => {
+  console.log("Server running");
+}); 
