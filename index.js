@@ -1,37 +1,73 @@
-import express from "express";
-import fetch from "node-fetch";
+const http = require("http");
+const https = require("https");
 
-const app = express();
-app.use(express.json());
+const TOKEN = process.env.TELEGRAM_TOKEN;
+const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const PORT = process.env.PORT || 3000;
 
-// Test endpoint
-app.get("/", (req, res) => {
-  res.send("Bot is running!");
-});
+function sendTelegramMessage(text) {
+  if (!TOKEN || !CHAT_ID) {
+    console.error("Missing TELEGRAM_TOKEN or TELEGRAM_CHAT_ID");
+    return;
+  }
 
-// TradingView webhook
-app.post("/webhook", async (req, res) => {
-  const { signal, price, pair } = req.body;
-
-  const MESSAGE = `Signal: ${signal}\nPrice: ${price}\nPair: ${pair}`;
-  const TELEGRAM_TOKEN = "8420150299:AAF3clV0XvDiBdmz31glpkj4Z5z-3EPvQc8";
-  const TELEGRAM_CHAT_ID = "1379138847";
-
-  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-
-  await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: TELEGRAM_CHAT_ID,
-      text: MESSAGE,
-    }),
+  const data = JSON.stringify({
+    chat_id: CHAT_ID,
+    text,
   });
 
-  res.send("OK");
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${TOKEN}/sendMessage`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(data),
+    },
+  };
+
+  const req = https.request(options, (res) => {
+    res.on("data", () => {});
+  });
+
+  req.on("error", (err) => {
+    console.error("Telegram error:", err);
+  });
+
+  req.write(data);
+  req.end();
+}
+
+const server = http.createServer((req, res) => {
+  if (req.method === "POST" && req.url === "/webhook") {
+    let body = "";
+
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+
+    req.on("end", () => {
+      try {
+        const json = JSON.parse(body || "{}");
+        console.log("Webhook received:", json);
+
+        const text = `Signal ${json.side || ""} ${json.symbol || ""} @ ${
+          json.price || ""
+        }`;
+        sendTelegramMessage(text);
+      } catch (e) {
+        console.error("Error parsing body:", e);
+      }
+
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end("ok");
+    });
+  } else {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("ok");
+  }
 });
 
-// Start server
-app.listen(3000, () => {
-  console.log("Server running");
+server.listen(PORT, () => {
+  console.log("Server listening on port", PORT);
 }); 
