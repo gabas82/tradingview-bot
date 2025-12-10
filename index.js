@@ -39,7 +39,7 @@ function sendTelegramMessage(text) {
 }
 
 const server = http.createServer((req, res) => {
-  if (req.method === "POST" && req.url === "/webhook") {
+  if (req.method === "POST" && req.url.startsWith("/webhook")) { 
     let body = "";
 
     req.on("data", (chunk) => {
