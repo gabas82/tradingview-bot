@@ -14,7 +14,7 @@ def home():
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.json
-    text = f"📊 Signal received:\n{data}"
+   text = f"🟢 SIGNAL\nPAIR: {data.get('symbol')}\nPRICE: {data.get('price')}" 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
