@@ -6,11 +6,13 @@ app = Flask(__name__)
 def home():
     return "OK", 200
 
-@app.route("/", methods=["POST"])
+@app.route("/webhook", methods=["POST"])
+@app.route("/webhook/", methods=["POST"])
 def webhook():
-    data = request.get_json(force=True)
-    print(data)
-    return jsonify({"status": "received"}), 200
+    data = request.get_json(silent=True)
+    print("RECEIVED:", data)
+    return jsonify({"status": "ok"}), 200
+
 
 if __name__ == "__main__":
-    app.run() 
+    app.run(host="0.0.0.0", port=10000) 
